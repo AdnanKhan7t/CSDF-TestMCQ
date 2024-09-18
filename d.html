@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Online Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff; /* White */
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #f5f0eb; /* Saffron */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        h2 {
+            text-align: center;
+            color: #138808; /* Green */
+        }
+        table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+        table td {
+            padding: 10px;
+            vertical-align: top;
+        }
+        .question p {
+            font-size: 1.2em;
+            margin: 0;
+        }
+        .answers input {
+            margin-right: 10px;
+        }
+        .answers label {
+            margin-left: 5px;
+        }
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #138808; /* Green */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+        }
+        .submit-btn:hover {
+            background-color: #0f6c06;
+        }
+        .results {
+            display: none;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .results ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .results li {
+            margin-bottom: 5px;
+        }
+        .question:hover {
+            background-color: #f0f0f0;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .incorrect-feedback {
+            color: red;
+            margin-top: 10px;
+            font-size: 0.9em;
+            display: none;
+        }
+        .incorrect-feedback.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Cybersecurity Online Test</h2>
+        <form id="quizForm">
+            <table id="questionTable"></table>
+            <button type="button" class="submit-btn" onclick="submitQuiz()">Submit Answers</button>
+            <div class="results" id="results">
+                <h3>Your Score: <span id="score"></span>/100</h3>
+                <p>Correct Answers:</p>
+                <ul id="correctAnswers"></ul>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Define questions and answers
+        const questions = [
+            { id: 1, text: 'What is the CIA Triad in cybersecurity?', options: ['Confidentiality, Integrity, Accountability', 'Confidentiality, Integrity, Availability', 'Confidentiality, Integrity, Authentication', 'Confidentiality, Integrity, Authorization'], correct: 'Confidentiality, Integrity, Availability' },
+            { id: 2, text: 'What does availability ensure in the CIA Triad?', options: ['Only authorized users can access information', 'Information is correct and unaltered', 'Timely and reliable access to information', 'Users can authenticate information'], correct: 'Timely and reliable access to information' },
+            { id: 3, text: 'Which of the following combines a retina scan with a PIN?', options: ['Multifactor Authentication', 'Symmetric Encryption', 'Asymmetric Encryption', 'Keylogging'], correct: 'Multifactor Authentication' },
+            { id: 4, text: 'What is the role of the Registration Authority (RA) in Public Key Infrastructure (PKI)?', options: ['It verifies the ownership of a public key.', 'It signs digital certificates.', 'It encrypts sensitive information.', 'It manages session keys.'], correct: 'It verifies the ownership of a public key.' },
+            { id: 5, text: 'What does symmetric encryption use to encrypt and decrypt data?', options: ['Public and Private Key', 'Digital Certificates', 'The same key for both operations', 'Different keys for encryption and decryption'], correct: 'The same key for both operations' },
+            { id: 6, text: 'In asymmetric encryption, what is the role of the private key?', options: ['It encrypts data.', 'It decrypts data.', 'It hashes data.', 'It creates digital certificates.'], correct: 'It decrypts data.' },
+            { id: 7, text: 'What type of attack occurs when an attacker pretends to be someone else to gain unauthorized access?', options: ['Phishing', 'SQL Injection', 'Spoofing', 'Trojan Horse'], correct: 'Spoofing' },
+            { id: 8, text: 'Which of the following is a property of cryptographic hash functions?', options: ['Easily reversible', 'Generates a fixed-length output from variable input', 'Requires a public key to function', 'Uses a session key to encrypt data'], correct: 'Generates a fixed-length output from variable input' },
+            { id: 9, text: "What is the main principle of Kerckhoffs' Principle?", options: ['The system should be secret.', 'The key should remain secret, not the algorithm.', 'Both the key and the algorithm should be secret.', 'The system should be easy to break.'], correct: 'The key should remain secret, not the algorithm.' },
+            { id: 10, text: 'Which cipher is a classical example of symmetric key encryption?', options: ['Caesar Cipher', 'RSA', 'Diffie-Hellman', 'ElGamal'], correct: 'Caesar Cipher' },
+            { id: 11, text: 'In asymmetric encryption, which key is used to encrypt the data?', options: ['Private key', 'Shared key', 'Symmetric key', 'Public key'], correct: 'Public key' },
+            { id: 12, text: 'Which of the following is considered a "zero-day" vulnerability?', options: ['A vulnerability patched within a day.', 'A vulnerability exploited before it is discovered.', 'A vulnerability that remains for more than 30 days.', 'A vulnerability that affects only one system.'], correct: 'A vulnerability exploited before it is discovered.' },
+            { id: 13, text: 'What is phishing?', options: ['A form of cyber attack targeting government systems.', 'An attack that tricks users into providing personal information.', 'A method used to break encryption algorithms.', 'A physical attack on servers.'], correct: 'An attack that tricks users into providing personal information.' },
+            { id: 14, text: 'What is an insider attack focused on?', options: ['Intellectual property theft, sabotage, and espionage', 'Phishing attacks', 'Only intellectual property theft', 'Destroying network infrastructure'], correct: 'Intellectual property theft, sabotage, and espionage' },
+            { id: 15, text: 'What kind of attack is SQL Injection?', options: ['A web-based attack targeting databases', 'A malware attack on browsers', 'A network-based attack using encryption', 'An attack using phishing emails'], correct: 'A web-based attack targeting databases' },
+            { id: 16, text: 'Which component of the risk assessment process involves identifying and quantifying threats?', options: ['Threat Action', 'Threat Assessment', 'Asset Value Assessment', 'Impact Evaluation'], correct: 'Threat Assessment' },
+            { id: 33, text: 'What is a botnet?', options: ['A network of infected computers controlled by an attacker', 'A security tool for monitoring network traffic', 'A type of virus that infects email accounts', 'A rootkit used for financial fraud'], correct: 'A network of infected computers controlled by an attacker' },
+            { id: 34, text: 'Which of the following is a Trojan Horse?', options: ['A virus disguised as a legitimate program', 'A worm that spreads through email', 'A ransomware that encrypts files', 'A hardware-based keylogger'], correct: 'A virus disguised as a legitimate program' },
+            { id: 35, text: 'What is a logic bomb?', options: ['A type of virus that replicates itself', 'A malicious program that is triggered by a specific event', 'A worm that spreads across networks', 'A social engineering technique'], correct: 'A malicious program that is triggered by a specific event' },
+            { id: 36, text: 'Which of the following describes the term "hacktivist"?', options: ['A hacker motivated by financial gain', 'A hacker motivated by political or social ideology', 'A hacker who works for government organizations', 'A hacker who focuses on network security'], correct: 'A hacker motivated by political or social ideology' },
+            { id: 37, text: 'What is the primary goal of an Advanced Persistent Threat (APT)?', options: ['To perform a quick attack and steal data', 'To stay undetected in a system for long periods', 'To spread ransomware and lock user files', 'To steal money from financial institutions'], correct: 'To stay undetected in a system for long periods' },
+            { id: 38, text: 'Which type of attack manipulates users into revealing confidential information via a fake website?', options: ['Phishing', 'Man-in-the-middle', 'Buffer Overflow', 'Cross-Site Scripting'], correct: 'Phishing' },
+            { id: 39, text: 'What is a script kiddie?', options: ['A highly skilled hacker', 'An amateur hacker using pre-made tools', 'A hacker working for government agencies', 'A hacker targeting critical infrastructure'], correct: 'An amateur hacker using pre-made tools' },
+            { id: 40, text: 'Which attack involves sending more data to a buffer than it can handle?', options: ['SQL Injection', 'Denial-of-Service', 'Buffer Overflow', 'Cross-Site Scripting'], correct: 'Buffer Overflow' },
+            { id: 41, text: 'Which attack exploits vulnerabilities in database queries?', options: ['SQL Injection', 'Cross-Site Scripting', 'Brute-force Attack', 'Ransomware'], correct: 'SQL Injection' },
+            { id: 42, text: 'Which of the following describes a keylogger?', options: ['A type of spyware that records user keystrokes', 'A type of ransomware that encrypts data', 'A worm that spreads through network traffic', 'A virus that deletes system files'], correct: 'A type of spyware that records user keystrokes' },
+            { id: 43, text: 'What is a rootkit?', options: ['A virus that disables antivirus software', 'A collection of software tools that enables unauthorized access', 'A malware that encrypts files', 'A worm that spreads through email'], correct: 'A collection of software tools that enables unauthorized access' },
+            { id: 44, text: 'Which attack involves overwhelming a system with more requests than it can handle?', options: ['Denial-of-Service (DoS)', 'Phishing', 'SQL Injection', 'Buffer Overflow'], correct: 'Denial-of-Service (DoS)' },
+            { id: 45, text: 'Which term refers to malware that automatically downloads and installs itself without the user’s consent?', options: ['Adware', 'Worm', 'Trojan', 'Dropper'], correct: 'Dropper' },
+            { id: 46, text: 'Which of the following malware types self-replicates?', options: ['Virus', 'Worm', 'Trojan', 'Spyware'], correct: 'Worm' },
+            { id: 47, text: 'What is a man-in-the-middle attack?', options: ['An attacker intercepts communication between two parties', 'An attacker manipulates database queries', 'An attacker uses malware to encrypt data', 'An attacker crashes the server with numerous requests'], correct: 'An attacker intercepts communication between two parties' },
+            { id: 48, text: 'Which attack involves reading and analyzing network traffic?', options: ['Network sniffing', 'Ransomware', 'Cross-Site Scripting', 'Worm attack'], correct: 'Network sniffing' },
+            { id: 49, text: 'Which of the following is NOT a characteristic of malware?', options: ['Encrypting files', 'Copying itself to other files', 'Providing a user with security', 'Stealing sensitive information'], correct: 'Providing a user with security' },
+            { id: 50, text: 'What is vishing?', options: ['Phishing via voice communication', 'Phishing via email', 'Sending malicious software through text', 'Stealing data from physical devices'], correct: 'Phishing via voice communication' },
+            { id: 51, text: 'What is the primary function of digital forensics in cybersecurity?', options: ['Prevent cyber attacks', 'Investigate and collect evidence of cyber crimes', 'Install antivirus software', 'Encrypt sensitive data'], correct: 'Investigate and collect evidence of cyber crimes' },
+            { id: 53, text: 'What is a vulnerability in cybersecurity?', options: ['A weakness in a system that can be exploited', 'A cyber attack method', 'A protective measure', 'A way to encrypt data'], correct: 'A weakness in a system that can be exploited' },
+            { id: 52, text: 'What is the first step in handling an Advanced Persistent Threat (APT)?', options: ['Conducting a forensic analysis', 'Identifying the vulnerability', 'Understanding the motive behind the attack', 'Installing firewalls'], correct: 'Understanding the motive behind the attack' },
+            { id: 54, text: 'What is malware forensics used for?', options: ['Encrypting files', 'Identifying what malware can do', 'Speeding up system performance', 'Modifying system settings'], correct: 'Identifying what malware can do' },
+            { id: 55, text: 'What tool is used for capturing network traffic during malware analysis?', options: ['Process Monitor', 'Wireshark', 'Volatility', 'FTK'], correct: 'Wireshark' },
+            { id: 56, text: 'What is the goal of static analysis in malware forensics?', options: ['Running malware to observe its behavior', 'Examining malware code without execution', 'Tracking the malware\'s origin', 'Cleaning the system of malware'], correct: 'Examining malware code without execution' },
+            { id: 57, text: 'What is the purpose of chain of custody in forensics?', options: ['To secure the suspect', 'To prevent tampering with evidence', 'To encrypt forensic data', 'To speed up investigations'], correct: 'To prevent tampering with evidence' },
+            { id: 58, text: 'Which tool is used to analyze memory dumps for malicious processes?', options: ['Volatility', 'Nmap', 'Nessus', 'WireShark'], correct: 'Volatility' },
+            { id: 59, text: 'What is a key aspect of an email forensic investigation?', options: ['Verifying sender’s email address', 'Installing email filtering tools', 'Writing email security protocols', 'Encrypting all emails'], correct: 'Verifying sender’s email address' },
+            { id: 60, text: 'What does a mobile forensic investigation focus on?', options: ['Extracting data from smartphones', 'Securing communication networks', 'Encrypting mobile applications', 'Detecting malware in mobile devices'], correct: 'Extracting data from smartphones' },
+            { id: 61, text: 'What is an example of logical acquisition in mobile forensics?', options: ['Cloning a device’s storage', 'Using the device’s user interface to recover data', 'Extracting data using automated tools', 'Recovering deleted data'], correct: 'Extracting data using automated tools' },
+            { id: 62, text: 'What is the purpose of the Cyber Crisis Management Plan (CCMP)?', options: ['Prevent cyber attacks', 'Detect, respond to, and recover from cyber incidents', 'Analyze malware samples', 'Encrypt sensitive data'], correct: 'Detect, respond to, and recover from cyber incidents' },
+            { id: 63, text: 'Which organization in India coordinates national cybersecurity-related issues?', options: ['CERT-In', 'NIC', 'NCIIPC', 'RBI'], correct: 'CERT-In' },
+            { id: 64, text: 'What is the goal of public key infrastructure (PKI)?', options: ['To provide encryption using shared keys', 'To manage digital certificates and keys', 'To secure email communication', 'To block malware attacks'], correct: 'To manage digital certificates and keys' },
+            { id: 65, text: 'What does GDPR regulate?', options: ['Secure encryption algorithms', 'Personal data protection and privacy', 'Network traffic monitoring', 'Banking cybersecurity compliance'], correct: 'Personal data protection and privacy' },
+            { id: 66, text: 'What does the term “cyber kill chain” describe?', options: ['A list of common cyber attacks', 'Steps attackers take to breach systems', 'Software designed to prevent attacks', 'Government regulations on cybersecurity'], correct: 'Steps attackers take to breach systems' },
+            { id: 67, text: 'What is the focus of memory forensics?', options: ['Analyzing files stored on disk', 'Investigating a system\'s physical memory', 'Encrypting sensitive memory content', 'Recovering lost files from hard drives'], correct: 'Investigating a system\'s physical memory' },
+            { id: 68, text: 'Which analysis method is used to examine malware\'s interaction with the system without running it?', options: ['Dynamic analysis', 'Behavioral analysis', 'Static analysis', 'Profiling'], correct: 'Static analysis' },
+            { id: 69, text: 'What type of attack targets web application vulnerabilities to gain unauthorized access to data?', options: ['SQL Injection', 'Ransomware', 'Phishing', 'DDoS'], correct: 'SQL Injection' },
+            { id: 70, text: 'What does a decompiler do in malware analysis?', options: ['Converts machine code into a high-level programming language', 'Encrypts malware to prevent analysis', 'Detects malware signatures in memory', 'Runs malware to observe its behavior'], correct: 'Converts machine code into a high-level programming language' },
+            { id: 76, text: 'What is an Advanced Persistent Threat (APT)?', options: ['A short-term attack focused on immediate damage', 'A stealthy, long-term attack targeting critical data', 'A malware designed for quick replication', 'A brute force attack to break passwords'], correct: 'A stealthy, long-term attack targeting critical data' },
+            { id: 77, text: 'What is a key challenge in addressing APTs?', options: ['APTs can be handled easily with basic security measures', 'APTs use advanced techniques and remain undetected', 'APTs are only focused on network-level attacks', 'APTs always target individual users'], correct: 'APTs use advanced techniques and remain undetected' },
+            { id: 78, text: 'Which organization is responsible for safeguarding critical Indian infrastructure against cyber attacks?', options: ['CERT-In', 'NIC', 'NCIIPC', 'RBI'], correct: 'NCIIPC' },
+            { id: 79, text: 'What role does email forensics play in cyber investigations?', options: ['It detects malware in the system', 'It reveals key information from email communication', 'It encrypts email for security', 'It deletes suspicious emails'], correct: 'It reveals key information from email communication' },
+            { id: 80, text: 'What is the key purpose of an intrusion detection system (IDS)?', options: ['Prevent network intrusions', 'Monitor and notify users of suspicious activity', 'Block malicious files', 'Encrypt sensitive data'], correct: 'Monitor and notify users of suspicious activity' },
+            { id: 81, text: 'What is a “clickjacking” attack?', options: ['Redirecting users to malicious websites', 'Hijacking legitimate clicks to execute hidden actions', 'Manipulating DNS records to access user data', 'Locking users out of their accounts'], correct: 'Hijacking legitimate clicks to execute hidden actions' },
+            { id: 82, text: 'Which regulatory framework in India focuses on securing cyberspace and critical infrastructure?', options: ['GDPR', 'Information Technology Act 2000', 'National Cyber Security Policy', 'RBI Cybersecurity Framework'], correct: 'National Cyber Security Policy' },
+            { id: 83, text: 'What is the first step of incident response after detecting a cyber attack?', options: ['Recovery', 'Containment', 'Analysis', 'Identification'], correct: 'Identification' },
+            { id: 84, text: 'Which method is used to document the progression of digital evidence from collection to presentation?', options: ['Chain of Custody', 'Risk Analysis', 'Incident Response Plan', 'Forensic Imaging'], correct: 'Chain of Custody' },
+            { id: 85, text: 'What does a risk assessment aim to do in cybersecurity?', options: ['Identify and quantify potential threats', 'Block malicious traffic', 'Install encryption algorithms', 'Recover lost data'], correct: 'Identify and quantify potential threats' },
+            { id: 86, text: 'What is dynamic analysis in malware forensics?', options: ['Reviewing the binary without running the code', 'Running the malware to observe its behavior', 'Encrypting malware to prevent analysis', 'Profiling CPU usage of malware'], correct: 'Running the malware to observe its behavior' },
+            { id: 87, text: 'Which of the following is an example of a passive cyber attack?', options: ['Denial of Service', 'Data interception without altering it', 'Spoofing', 'Ransomware encryption'], correct: 'Data interception without altering it' },
+            { id: 88, text: 'What is the key function of the RBI Cybersecurity Framework?', options: ['Monitor email communications for attacks', 'Set cybersecurity policies for banks', 'Encrypt all banking transactions', 'Provide a framework for securing personal data'], correct: 'Set cybersecurity policies for banks' },
+            { id: 89, text: 'What does encryption ensure in cybersecurity?', options: ['Data integrity', 'Data confidentiality', 'Data availability', 'Data interoperability'], correct: 'Data confidentiality' },
+            { id: 90, text: 'What is a Zero-Day attack?', options: ['An attack that occurs before a vulnerability is publicly known', 'A brute force attack on passwords', 'A network-level phishing attack', 'An attack using outdated software'], correct: 'An attack that occurs before a vulnerability is publicly known' },
+            { id: 91, text: 'What is the focus of web application firewalls (WAF)?', options: ['Detecting malware on user systems', 'Protecting web applications from attacks', 'Encrypting communication between servers', 'Blocking IP addresses from external networks'], correct: 'Protecting web applications from attacks' },      
+            { id: 92, text: 'Which of the following describes social engineering?', options: ['Manipulating people into divulging sensitive information', 'Stealing encryption keys', 'Exploiting system vulnerabilities', 'Modifying email communication protocols'], correct: 'Manipulating people into divulging sensitive information' },
+            { id: 93, text: 'Which framework governs personal data protection in the European Union?', options: ['HIPAA', 'GDPR', 'PCI DSS', 'ISO 27001'], correct: 'GDPR' },
+            { id: 94, text: 'Which of the following best describes a ransomware attack?', options: ['Encrypting data and demanding payment for decryption', 'Phishing through email to collect sensitive data', 'Redirecting website traffic to malicious sites', 'Infecting systems through mobile applications'], correct: 'Encrypting data and demanding payment for decryption' },
+            { id: 95, text: 'What is the main function of a cryptographic hash function?', options: ['Encrypt data for secure storage', 'Generate a fixed-length output from input data', 'Recover deleted data from hard drives', 'Monitor network traffic'], correct: 'Generate a fixed-length output from input data' },
+            { id: 96, text: 'What is the key benefit of using multifactor authentication?', options: ['Requires encryption on all data', 'Adds an extra layer of security beyond passwords', 'Prevents phishing attacks', 'Encrypts communication channels'], correct: 'Adds an extra layer of security beyond passwords' },
+            { id: 97, text: 'What role does process monitor play in malware forensics?', options: ['Tracks process creation and behavior in the system', 'Encrypts processes to prevent analysis', 'Logs all malware network traffic', 'Analyzes the binary without execution'], correct: 'Tracks process creation and behavior in the system' },
+            { id: 98, text: 'Which of the following is a regulatory requirement for cybersecurity in India?', options: ['Cybersecurity Framework by RBI', 'National Critical Infrastructure Policy', 'Personal Data Protection Act', 'General Data Protection Regulation'], correct: 'Cybersecurity Framework by RBI' },
+            { id: 99, text: 'What is the role of deauthentication attacks?', options: ['Disrupt connections between users and access points', 'Encrypt user data during authentication', 'Block all network traffic on a local network', 'Modify the encryption key for secure communication'], correct: 'Disrupt connections between users and access points' },
+            { id: 100, text: 'What is the outcome of successful risk assessment in cybersecurity?', options: ['Secure access control policies', 'Identification of potential threats and vulnerabilities', 'Creation of cryptographic keys', 'Blocking unauthorized network traffic'], correct: 'Identification of potential threats and vulnerabilities' },            { id: 101, text: 'What is the primary purpose of using write-blockers in digital forensics?', options: ['To speed up data acquisition', 'To prevent any changes to the evidence', 'To increase the storage capacity', 'To decrypt encrypted data'], correct: 'To prevent any changes to the evidence' },
+            { id: 102, text: 'Which of the following best describes a man-in-the-middle (MITM) attack?', options: ['Intercepting and altering communication between two parties', 'Directly accessing the target system to steal data', 'Sending large volumes of traffic to disrupt services', 'Capturing and analyzing network packets without modification'], correct: 'Intercepting and altering communication between two parties' },
+            { id: 103, text: 'What type of attack involves exploiting a vulnerability in a web application\'s database?', options: ['Cross-Site Scripting (XSS)', 'SQL Injection', 'Phishing', 'Denial of Service (DoS)'], correct: 'SQL Injection' },
+            { id: 104, text: 'Which tool is commonly used for network packet analysis?', options: ['Wireshark', 'Volatility', 'FTK Imager', 'EnCase'], correct: 'Wireshark' },
+            { id: 105, text: 'What is the main advantage of asymmetric encryption over symmetric encryption?', options: ['Faster encryption and decryption', 'No need for key exchange', 'Uses different keys for encryption and decryption', 'Better for bulk data encryption'], correct: 'Uses different keys for encryption and decryption' },
+            { id: 106, text: 'Which of the following is NOT a characteristic of a good cryptographic hash function?', options: ['Deterministic', 'Fast to compute', 'Reversible', 'Collision-resistant'], correct: 'Reversible' },
+            { id: 107, text: 'What does the term "hash collision" refer to?', options: ['When two different inputs produce the same hash value', 'When a hash function is very slow', 'When a hash function is not deterministic', 'When an input produces multiple hash values'], correct: 'When two different inputs produce the same hash value' },
+            { id: 108, text: 'Which of the following is a method used to protect data during transmission?', options: ['Data hashing', 'Symmetric encryption', 'File compression', 'Access control lists'], correct: 'Symmetric encryption' },
+            { id: 109, text: 'What is the primary goal of digital forensics?', options: ['To recover lost data', 'To investigate and present evidence in a legal context', 'To install encryption software', 'To prevent cyber attacks'], correct: 'To investigate and present evidence in a legal context' },
+            { id: 110, text: 'Which regulation is specifically designed for the protection of financial data in the US?', options: ['GDPR', 'SOX', 'PCI-DSS', 'HIPAA'], correct: 'PCI-DSS' },
+            { id: 111, text: 'Which type of malware disguises itself as a legitimate application?', options: ['Virus', 'Trojan Horse', 'Worm', 'Adware'], correct: 'Trojan Horse' },
+            { id: 112, text: 'What does an Intrusion Prevention System (IPS) do?', options: ['Detects and prevents unauthorized access', 'Monitors network traffic only', 'Provides data encryption', 'Manages digital certificates'], correct: 'Detects and prevents unauthorized access' },
+            { id: 113, text: 'What is the primary function of a digital certificate?', options: ['To encrypt data', 'To verify the identity of a user or device', 'To monitor network traffic', 'To detect malware'], correct: 'To verify the identity of a user or device' },
+            { id: 114, text: 'Which attack method involves flooding a network with excessive traffic?', options: ['SQL Injection', 'Cross-Site Scripting (XSS)', 'Denial of Service (DoS)', 'Man-in-the-Middle'], correct: 'Denial of Service (DoS)' },
+            { id: 115, text: 'What does the term "phishing" describe?', options: ['Sending fraudulent messages to trick individuals into revealing sensitive information', 'Encrypting data to secure it', 'Intercepting and altering communications', 'Attacking physical network hardware'], correct: 'Sending fraudulent messages to trick individuals into revealing sensitive information' },
+            { id: 116, text: 'Which type of cyber attack involves altering a website’s content to mislead visitors?', options: ['SQL Injection', 'Cross-Site Scripting (XSS)', 'Spoofing', 'Man-in-the-Middle'], correct: 'Cross-Site Scripting (XSS)' },
+            { id: 117, text: 'What is a "buffer overflow" vulnerability?', options: ['A weakness where data exceeds the allocated space in memory', 'An error in data encryption', 'A type of malware infection', 'A misconfiguration in network settings'], correct: 'A weakness where data exceeds the allocated space in memory' },
+            { id: 118, text: 'Which protocol is used to secure communication between a web browser and a server?', options: ['HTTP', 'FTP', 'HTTPS', 'Telnet'], correct: 'HTTPS' },
+            { id: 119, text: 'What is the primary purpose of a firewall?', options: ['To prevent unauthorized access to or from a private network', 'To encrypt files for storage', 'To manage digital certificates', 'To detect and remove malware'], correct: 'To prevent unauthorized access to or from a private network' },
+            { id: 120, text: 'Which of the following is a type of malware that encrypts files and demands a ransom?', options: ['Adware', 'Ransomware', 'Spyware', 'Worm'], correct: 'Ransomware' },
+            { id: 121, text: 'Which term describes an attacker posing as a legitimate entity to gain access to confidential information?', options: ['Spoofing', 'Phishing', 'SQL Injection', 'DDoS'], correct: 'Spoofing' },
+            { id: 122, text: 'What is a “brute force attack”?', options: ['An attack that involves guessing passwords until the correct one is found', 'An attack that floods the network with traffic', 'An attack that exploits software vulnerabilities', 'An attack that intercepts communications'], correct: 'An attack that involves guessing passwords until the correct one is found' },
+            { id: 123, text: 'What does the acronym PCI-DSS stand for?', options: ['Payment Card Industry Data Security Standard', 'Public Cybersecurity Information Data Security Standard', 'Private Card Information Digital Security Standard', 'Personal Cybersecurity Integrity Data Standard'], correct: 'Payment Card Industry Data Security Standard' },
+            { id: 124, text: 'Which of the following is a form of network attack that involves intercepting and altering data in transit?', options: ['Man-in-the-Middle', 'SQL Injection', 'Brute Force', 'Cross-Site Scripting'], correct: 'Man-in-the-Middle' },
+            { id: 125, text: 'Which type of analysis involves examining the behavior of malware in a controlled environment?', options: ['Static analysis', 'Dynamic analysis', 'Reverse engineering', 'Hash analysis'], correct: 'Dynamic analysis' }
+        ];
+
+        // Function to generate questions dynamically
+        function generateQuestions() {
+            const questionTable = document.getElementById('questionTable');
+            questions.forEach(q => {
+                const row = document.createElement('tr');
+                row.classList.add('question');
+                row.innerHTML = `
+                    <td>
+                        <p>${q.id}. ${q.text}</p>
+                        <div class="answers">
+                            ${q.options.map(opt => `
+                                <input type="radio" name="q${q.id}" value="${opt}" id="q${q.id}_${opt}" required>
+                                <label for="q${q.id}_${opt}">${opt}</label><br>
+                            `).join('')}
+                        </div>
+                        <div class="incorrect-feedback" id="feedback${q.id}"></div>
+                    </td>
+                `;
+                questionTable.appendChild(row);
+            });
+        }
+
+        // Generate questions when the page loads
+        window.onload = generateQuestions;
+
+        function submitQuiz() {
+            let score = 0;
+            const correctAnswersList = document.getElementById('correctAnswers');
+            correctAnswersList.innerHTML = '';
+
+            // Process each question
+            questions.forEach(q => {
+                const userAnswer = document.querySelector(`input[name="q${q.id}"]:checked`);
+                const feedbackElement = document.getElementById(`feedback${q.id}`);
+
+                if (userAnswer && userAnswer.value === q.correct) {
+                    score += 6.25; // Assuming each question is worth 6.25 points
+                    feedbackElement.classList.remove('show');
+                } else {
+                    feedbackElement.textContent = `Incorrect. The correct answer is: ${q.correct}`;
+                    feedbackElement.classList.add('show');
+                }
+
+                const listItem = document.createElement('li');
+                listItem.textContent = `Question ${q.id}: ${q.correct}`;
+                correctAnswersList.appendChild(listItem);
+            });
+
+            // Show the score and correct answers
+            document.getElementById('score').textContent = score.toFixed(2);
+            document.getElementById('results').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
